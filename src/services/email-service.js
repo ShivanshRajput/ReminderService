@@ -20,7 +20,6 @@ const sendBasicEmail = async (mailFrom, mailTo, mailSubject, mailBody) => {
 
 const fetchPendingEmails = async() => {
     try {
-        // const repo = new TicketRepositary();
         const response = await repo.get({status: "PENDING"});
         return response;
     } catch (error) {
@@ -30,7 +29,6 @@ const fetchPendingEmails = async() => {
 
 const createNotification = async(data) => {
     try {
-        // console.log(data);
         const response = await repo.create(data);
         return response;
     } catch (error) {
@@ -48,9 +46,29 @@ const updateTicketStatus = async(ticketId, data) => {
     }
 }
 
+const subscribeEvents = async(payload) => {
+    // console.log(payload,"------");
+    let service = payload.service;
+    let data = payload.data;
+    // console.log(service,data,'====')
+    switch(service){
+        case 'CREATE_TICKET':
+            await createNotification(data);
+            break;
+        case 'SEND_BASIC_MAIL':
+            // console.log('bhej rahe hain...')
+            await sendBasicEmail(data);
+            break;
+        default:
+            console.log('No valid event recieved');
+            break;
+    }
+}
+
 module.exports = {
     sendBasicEmail,
     fetchPendingEmails,
     createNotification,
-    updateTicketStatus
+    updateTicketStatus,
+    subscribeEvents 
 }
